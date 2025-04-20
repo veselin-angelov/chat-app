@@ -1,9 +1,9 @@
 import { WebSocketServer } from 'ws';
-import { usersStorage } from '@app/storage/users.storage';
+import { usersStorage } from '@app/storage/memory';
 import { initializeServices } from '@app/services';
-import { roomsStorage } from '@app/storage/rooms.storage';
-import { connectionHandler } from '@app/handlers/connection.handler';
-import { messagesStorage } from '@app/storage/messages.storage';
+import { roomsStorage } from '@app/storage/memory';
+import { messagesStorage } from '@app/storage/memory';
+import { connectionHandler } from '@app/connections/handlers/connection.handler';
 
 /**
  * Initialize the application
@@ -23,8 +23,3 @@ export const initializeApp = () => {
 
   return wss;
 };
-
-// If this is the main module, start the app
-if (require.main === module) {
-  initializeApp();
-}

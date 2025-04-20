@@ -1,5 +1,5 @@
 import 'module-alias/register';
-import { initializeApp } from './app';
+import { initializeApp } from '@app/app';
 
 // Initialize the application
 const server = initializeApp();

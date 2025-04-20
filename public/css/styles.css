@@ -239,6 +239,12 @@ body {
   font-size: 18px;
 }
 
+.subscribe-btn.button-flash {
+  background-color: rgba(25, 118, 210, 0.2);
+  transform: scale(1.2);
+  transition: all 0.3s ease;
+}
+
 .room-list li.subscribed .subscribe-btn {
   color: #1976d2;
 }
@@ -575,4 +581,85 @@ body {
   margin: 20px auto;
   list-style-type: none;
   font-size: 0.9rem;
+}
+
+.users-sidebar-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.users-sidebar-list li {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.users-sidebar-list li:hover {
+  background-color: #f0f0f0;
+}
+
+.users-sidebar-list li.active {
+  background-color: #e6f0ff;
+}
+
+.users-sidebar-list .user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #1976d2;
+  color: white;
+  margin-right: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.users-sidebar-list .user-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.users-sidebar-list .dm-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #1976d2;
+  margin-left: 8px;
+  display: none;
+}
+
+.users-sidebar-list li.has-new-messages .dm-indicator {
+  display: block;
+}
+
+/* Direct message styling in chat */
+#messages > li[data-direct='true'] {
+  background-color: #fff8e1;
+  border-left: 3px solid #ffb300;
+}
+
+.users-sidebar-list .user-name.new-user {
+  color: #1976d2;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    color: #1976d2;
+  }
+  50% {
+    color: #2196f3;
+  }
+  100% {
+    color: #1976d2;
+  }
 }
