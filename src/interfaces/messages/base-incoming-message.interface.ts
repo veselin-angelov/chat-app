@@ -1,0 +1,8 @@
+import { IncomingMessageType } from '@app/enums';
+
+export interface IBaseIncomingMessage<
+  T extends IncomingMessageType = IncomingMessageType,
+> {
+  id: string;
+  type: T;
+}

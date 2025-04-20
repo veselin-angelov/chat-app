@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Chat</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="js/chat.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+  </head>
+  <body>
+    <div id="connection-controls">
+      <button id="connect-btn">Connect</button>
+      <button id="disconnect-btn" disabled>Disconnect</button>
+      <span id="status">Disconnected</span>
+    </div>
+    <div class="app-container">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h3>Rooms</h3>
+          <button id="refresh-rooms-btn" class="refresh-btn" disabled>
+            Refresh
+          </button>
+        </div>
+        <ul id="room-list" class="room-list">
+          <!-- Rooms will be listed here -->
+        </ul>
+      </div>
+      <div class="main-content">
+        <div class="room-header" id="room-header" style="display: none">
+          <h3 id="current-room-name">Select a room</h3>
+          <div class="room-actions">
+            <button
+              id="show-users-btn"
+              class="icon-button"
+              title="Show Users"
+              disabled
+            >
+              <span class="material-icons">people</span>
+            </button>
+          </div>
+        </div>
+        <ul id="messages"></ul>
+
+        <!-- Users Panel -->
+        <div id="users-panel" class="users-panel">
+          <div class="users-panel-header">
+            <span>Room Users</span>
+            <button class="users-panel-close" id="close-users-panel">
+              &times;
+            </button>
+          </div>
+          <ul id="users-list" class="users-list">
+            <!-- Users will be listed here -->
+          </ul>
+        </div>
+      </div>
+    </div>
+    <form id="form" action="">
+      <input
+        class="input"
+        id="message"
+        autocomplete="off"
+        placeholder="Type a message..."
+      />
+      <button id="send-btn" disabled>
+        <span class="material-icons">send</span>
+      </button>
+    </form>
+  </body>
+</html>
