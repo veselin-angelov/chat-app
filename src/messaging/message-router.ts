@@ -1,6 +1,5 @@
-import { WebSocket } from 'ws';
+import { WebSocket, RawData } from 'ws';
 import { UserInfo } from '@app/users/types';
-import { RawData } from 'ws';
 import { IncomingMessageType, OutgoingMessageType } from '@app/messaging/enums';
 import { IMessageHandler } from '@app/messaging/interfaces/message-handler.interface';
 import {
