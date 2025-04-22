@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "nodemon",
+    "start:prod": "tsc && node dist/index.js",
     "build": "tsc"
   },
   "dependencies": {

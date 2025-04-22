@@ -2,8 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { RoomInfo } from '@app/rooms/types';
 import { IRoomsStorage } from '@app/storage/interfaces';
 
-// Implementation of rooms storage
-class RoomsStorage implements IRoomsStorage {
+export class RoomsStorage implements IRoomsStorage {
   private roomsMap: Map<string, RoomInfo>;
 
   constructor() {
@@ -14,14 +13,13 @@ class RoomsStorage implements IRoomsStorage {
   }
 
   createRoom(name: string): RoomInfo {
-    const roomId = uuidv4();
     const room: RoomInfo = {
-      id: roomId,
+      id: uuidv4(),
       name: name,
       users: new Set<string>(),
     };
 
-    this.roomsMap.set(roomId, room);
+    this.roomsMap.set(room.id, room);
     return room;
   }
 
@@ -31,16 +29,6 @@ class RoomsStorage implements IRoomsStorage {
 
   getAllRooms(): RoomInfo[] {
     return Array.from(this.roomsMap.values());
-  }
-
-  removeRoom(roomId: string): void {
-    const room = this.getRoom(roomId);
-
-    if (!room) {
-      return;
-    }
-
-    this.roomsMap.delete(roomId);
   }
 
   addUserToRoom(userId: string, roomId: string): boolean {
@@ -74,6 +62,3 @@ class RoomsStorage implements IRoomsStorage {
     return Array.from(room.users);
   }
 }
-
-// Export a singleton instance
-export const roomsStorage = new RoomsStorage();

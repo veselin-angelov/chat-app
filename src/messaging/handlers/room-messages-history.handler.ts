@@ -1,37 +1,42 @@
 import {
-  IErrorOutgoingMessage,
   IFetchRoomMessagesHistoryIncomingMessage,
+  IMessageHandler,
   IRoomMessagesHistoryOutgoingMessage,
 } from '@app/messaging/interfaces';
 import { sendSafe } from '@app/messaging/helpers';
-import { OutgoingMessageType } from '@app/messaging/enums';
-import { messageService, roomService } from '@app/services';
-import { MessageHandler } from '@app/messaging/types';
+import { IncomingMessageType, OutgoingMessageType } from '@app/messaging/enums';
+import { IMessageService } from '@app/messaging/interfaces/message-service.interface';
+import { IRoomService } from '@app/rooms/interfaces';
+import { WebSocket } from 'ws';
 
-/**
- * Handler for sending room message history to a client
- */
-export const roomMessagesHistoryHandler: MessageHandler<
-  IFetchRoomMessagesHistoryIncomingMessage
-> = (socket, data) => {
-  const room = roomService.getRoom(data.room);
+export class RoomMessagesHistoryHandler
+  implements IMessageHandler<IFetchRoomMessagesHistoryIncomingMessage>
+{
+  public readonly messageType = IncomingMessageType.FETCH_ROOM_MESSAGES_HISTORY;
 
-  // TODO: export to global handler, leave the error throwing to the service and handling to the caller
-  if (!room) {
-    return sendSafe<IErrorOutgoingMessage>(socket, {
-      id: data.id,
-      type: OutgoingMessageType.ERROR,
-      message: `Room ${data.room} not found`,
+  constructor(
+    private readonly roomService: IRoomService,
+    private readonly messageService: IMessageService,
+  ) {}
+
+  public async handle(
+    socket: WebSocket,
+    message: IFetchRoomMessagesHistoryIncomingMessage,
+  ): Promise<void> {
+    const room = this.roomService.getRoom(message.room);
+
+    if (!room) {
+      throw new Error(`Room ${message.room} not found`);
+    }
+
+    const roomHistory = this.messageService.getRoomMessageHistory(message.room);
+
+    // Send room history to the user
+    return sendSafe<IRoomMessagesHistoryOutgoingMessage>(socket, {
+      id: message.id,
+      type: OutgoingMessageType.ROOM_MESSAGES_HISTORY,
+      room: message.room,
+      messages: roomHistory,
     });
   }
-
-  const roomHistory = messageService.getRoomMessageHistory(data.room);
-
-  // Send room history to the user
-  sendSafe<IRoomMessagesHistoryOutgoingMessage>(socket, {
-    id: data.id,
-    type: OutgoingMessageType.ROOM_MESSAGES_HISTORY,
-    room: data.room,
-    messages: roomHistory,
-  });
-};
+}

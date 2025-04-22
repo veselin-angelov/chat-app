@@ -7,18 +7,24 @@ import {
   IUsersStorage,
 } from '@app/storage/interfaces';
 import { ISubscriptionService } from '@app/subscriptions/interfaces';
-import { IMessageService } from '@app/messaging/interfaces';
+import {
+  IDirectMessageOutgoingMessage,
+  IMessageOutgoingMessage,
+  IMessageService,
+} from '@app/messaging/interfaces';
 import { MessageInfo } from '@app/messaging/types';
+import { IUserService } from '@app/users/interfaces';
+import { IRoomService } from '@app/rooms/interfaces';
 
 /**
  * Service for message operations
  */
 export class MessageService implements IMessageService {
   constructor(
-    private readonly usersStorage: IUsersStorage,
-    private readonly roomsStorage: IRoomsStorage,
-    private readonly subscriptionService: ISubscriptionService,
     private readonly messagesStorage: IMessagesStorage,
+    private readonly userService: IUserService,
+    private readonly roomService: IRoomService,
+    private readonly subscriptionService: ISubscriptionService,
   ) {}
 
   /**
@@ -30,8 +36,8 @@ export class MessageService implements IMessageService {
     content: string,
   ): boolean {
     // Validate inputs
-    const user = this.usersStorage.getUser(fromUserId);
-    const room = this.roomsStorage.getRoom(roomId);
+    const user = this.userService.getUser(fromUserId);
+    const room = this.roomService.getRoom(roomId);
 
     if (!user || !room) {
       return false;
@@ -57,18 +63,19 @@ export class MessageService implements IMessageService {
     );
 
     // Send message to all subscribers
-    subscribers.forEach((subscriberId) => {
-      const subscriber = this.usersStorage.getUser(subscriberId);
-      if (subscriber && subscriber.socket) {
-        this.sendMessageToSocket(
-          subscriber.socket,
-          message.id,
-          roomId,
-          content,
-          user.id,
-          user.username,
-        );
+    subscribers.forEach((subscriber) => {
+      if (!subscriber || !subscriber.socket) {
+        return;
       }
+
+      this.sendMessageToSocket(
+        subscriber.socket,
+        message.id,
+        roomId,
+        content,
+        user.id,
+        user.username,
+      );
     });
 
     return true;
@@ -83,8 +90,8 @@ export class MessageService implements IMessageService {
     content: string,
   ): boolean {
     // Validate inputs
-    const fromUser = this.usersStorage.getUser(fromUserId);
-    const toUser = this.usersStorage.getUser(toUserId);
+    const fromUser = this.userService.getUser(fromUserId);
+    const toUser = this.userService.getUser(toUserId);
 
     if (!fromUser || !toUser) {
       return false;
@@ -99,7 +106,7 @@ export class MessageService implements IMessageService {
     );
 
     // Send to recipient if they're online
-    if (toUser.socket) {
+    if (!!toUser.socket) {
       this.sendDirectMessageToSocket(
         toUser.socket,
         message.id,
@@ -116,11 +123,10 @@ export class MessageService implements IMessageService {
    * Get message history for a room
    */
   getRoomMessageHistory(roomId: string): MessageInfo[] {
-    const room = this.roomsStorage.getRoom(roomId);
+    const room = this.roomService.getRoom(roomId);
 
     if (!room) {
-      // TODO: throw error
-      return [];
+      throw new Error(`Room ${roomId} not found`);
     }
 
     return this.messagesStorage.getRoomMessages(roomId);
@@ -131,8 +137,8 @@ export class MessageService implements IMessageService {
    */
   getDirectMessageHistory(userIdA: string, userIdB: string): MessageInfo[] {
     // Check if both users exist
-    const userA = this.usersStorage.getUser(userIdA);
-    const userB = this.usersStorage.getUser(userIdB);
+    const userA = this.userService.getUser(userIdA);
+    const userB = this.userService.getUser(userIdB);
 
     if (!userA || !userB) {
       return [];
@@ -152,7 +158,7 @@ export class MessageService implements IMessageService {
     fromUserId: string,
     fromUsername: string,
   ): void {
-    sendSafe(socket, {
+    sendSafe<IMessageOutgoingMessage>(socket, {
       id: messageId,
       type: OutgoingMessageType.ROOM_MESSAGE,
       room: roomId,
@@ -174,7 +180,7 @@ export class MessageService implements IMessageService {
     fromUserId: string,
     fromUsername: string,
   ): void {
-    sendSafe(socket, {
+    sendSafe<IDirectMessageOutgoingMessage>(socket, {
       id: messageId,
       type: OutgoingMessageType.DIRECT_MESSAGE,
       message: content,

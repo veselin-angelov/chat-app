@@ -4,7 +4,7 @@ export * from './fetch-direct-message-history-incoming-message.interface';
 export * from './fetch-room-messages-history-incoming-message.interface';
 export * from './list-rooms-incoming-message.interface';
 export * from './list-room-users-incoming-message.interface';
-export * from './send-message-incoming-message.interface';
+export * from './send-room-message-incoming-message.interface';
 export * from './subscribe-incoming-message.interface';
 export * from './unsubscribe-incoming-message.interface';
 export * from './list-users-incoming-message.interface';

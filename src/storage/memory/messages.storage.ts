@@ -2,8 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { MessageInfo } from '@app/messaging/types';
 import { IMessagesStorage } from '@app/storage/interfaces';
 
-// Implementation of messages storage
-class MessagesStorage implements IMessagesStorage {
+export class MessagesStorage implements IMessagesStorage {
   private messagesMap: Map<string, MessageInfo>;
   private roomMessages: Map<string, Set<string>>;
   private directMessages: Map<string, Set<string>>;
@@ -70,12 +69,12 @@ class MessagesStorage implements IMessagesStorage {
     return message;
   }
 
-  getMessage(messageId: string): MessageInfo | undefined {
-    return this.messagesMap.get(messageId);
-  }
-
   getRoomMessages(roomId: string): MessageInfo[] {
-    const roomMessageIds = this.roomMessages.get(roomId) || new Set<string>();
+    const roomMessageIds = this.roomMessages.get(roomId);
+
+    if (!roomMessageIds) {
+      return [];
+    }
 
     // Get all messages for this room
     let messages = Array.from(roomMessageIds)
@@ -91,8 +90,11 @@ class MessagesStorage implements IMessagesStorage {
   getDirectMessages(userIdA: string, userIdB: string): MessageInfo[] {
     const conversationKey = this.getConversationKey(userIdA, userIdB);
 
-    const directMessageIds =
-      this.directMessages.get(conversationKey) || new Set<string>();
+    const directMessageIds = this.directMessages.get(conversationKey);
+
+    if (!directMessageIds) {
+      return [];
+    }
 
     // Get all direct messages between these users
     let messages = Array.from(directMessageIds)
@@ -105,18 +107,6 @@ class MessagesStorage implements IMessagesStorage {
     return messages;
   }
 
-  clearRoomMessages(roomId: string): void {
-    const messageIds = this.roomMessages.get(roomId) || new Set<string>();
-
-    // Delete each message
-    for (const messageId of messageIds) {
-      this.messagesMap.delete(messageId);
-    }
-
-    // Clear the room's message set
-    this.roomMessages.delete(roomId);
-  }
-
   // Helper methods
   private addMessageToRoom(roomId: string, messageId: string): void {
     let roomSet = this.roomMessages.get(roomId);
@@ -127,19 +117,6 @@ class MessagesStorage implements IMessagesStorage {
     }
 
     roomSet.add(messageId);
-  }
-
-  private removeMessageFromRoom(roomId: string, messageId: string): void {
-    const roomSet = this.roomMessages.get(roomId);
-
-    if (roomSet) {
-      roomSet.delete(messageId);
-
-      // Clean up empty sets
-      if (roomSet.size === 0) {
-        this.roomMessages.delete(roomId);
-      }
-    }
   }
 
   private getConversationKey(userIdA: string, userIdB: string): string {
@@ -162,25 +139,4 @@ class MessagesStorage implements IMessagesStorage {
 
     messageSet.add(messageId);
   }
-
-  private removeFromDirectMessageIndex(
-    fromUserId: string,
-    toUserId: string,
-    messageId: string,
-  ): void {
-    const conversationKey = this.getConversationKey(fromUserId, toUserId);
-    const messageSet = this.directMessages.get(conversationKey);
-
-    if (messageSet) {
-      messageSet.delete(messageId);
-
-      // Clean up empty sets
-      if (messageSet.size === 0) {
-        this.directMessages.delete(conversationKey);
-      }
-    }
-  }
 }
-
-// Export a singleton instance
-export const messagesStorage = new MessagesStorage();

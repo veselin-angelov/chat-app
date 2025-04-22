@@ -32,11 +32,4 @@ export interface IUserService {
    * @returns true if user was removed, false if user wasn't found
    */
   removeUser(userId: string): boolean;
-
-  /**
-   * Get users subscribed to a specific room
-   * @param roomId ID of the room
-   * @returns Array of users in the room
-   */
-  getUsersInRoom(roomId: string): UserInfo[];
 }

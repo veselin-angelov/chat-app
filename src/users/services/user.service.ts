@@ -12,7 +12,6 @@ import { generateUsername } from '@app/users/helpers';
 export class UserService implements IUserService {
   constructor(
     private readonly usersStorage: IUsersStorage,
-    private readonly roomsStorage: IRoomsStorage,
     private readonly subscriptionService: ISubscriptionService,
   ) {}
 
@@ -68,20 +67,5 @@ export class UserService implements IUserService {
     this.usersStorage.removeUser(userId);
 
     return true;
-  }
-
-  /**
-   * Get all users subscribed to a specific room
-   */
-  getUsersInRoom(roomId: string): UserInfo[] {
-    const room = this.roomsStorage.getRoom(roomId);
-
-    if (!room) {
-      return [];
-    }
-
-    return Array.from(room.users)
-      .map((userId) => this.usersStorage.getUser(userId))
-      .filter((user): user is UserInfo => user !== undefined);
   }
 }

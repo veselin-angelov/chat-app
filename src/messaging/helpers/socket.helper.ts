@@ -1,13 +1,17 @@
-import { IBaseOutgoingMessage } from '@app/messaging/interfaces';
 import { WebSocket } from 'ws';
+import { IBaseOutgoingMessage } from '@app/messaging/interfaces/outgoing-messages';
 
-export const sendSafe = <T extends IBaseOutgoingMessage>(
-  socket: WebSocket,
-  msg: T,
-) => {
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    throw new Error(`Something is wrong with socket`);
+/**
+ * Safely sends a message through a WebSocket
+ * @param socket WebSocket to send through
+ * @param data Data to send
+ */
+export function sendSafe<T extends IBaseOutgoingMessage>(socket: WebSocket, data: T): void {
+  try {
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(data));
+    }
+  } catch (error) {
+    console.error('Error sending WebSocket message:', error);
   }
-
-  socket.send(JSON.stringify(msg));
-};
+}

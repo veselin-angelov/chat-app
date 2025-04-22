@@ -4,5 +4,5 @@ import { RoomInfo } from '@app/rooms/types';
 
 export interface IRoomsListOutgoingMessage
   extends IBaseOutgoingMessage<OutgoingMessageType.ROOMS_LIST> {
-  rooms: Pick<RoomInfo, 'id' | 'name'>[]; // TODO: fix
+  rooms: Pick<RoomInfo, 'id' | 'name'>[];
 }

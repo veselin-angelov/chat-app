@@ -35,13 +35,6 @@ export interface IMessagesStorage {
   ): MessageInfo;
 
   /**
-   * Get a message by ID
-   * @param messageId ID of the message
-   * @returns Message info or undefined if not found
-   */
-  getMessage(messageId: string): MessageInfo | undefined;
-
-  /**
    * Get messages for a specific room
    * @param roomId ID of the room
    * @returns Array of message info objects
@@ -55,10 +48,4 @@ export interface IMessagesStorage {
    * @returns Array of message info objects
    */
   getDirectMessages(userIdA: string, userIdB: string): MessageInfo[];
-
-  /**
-   * Clear all messages in a room
-   * @param roomId ID of the room
-   */
-  clearRoomMessages(roomId: string): void;
 }

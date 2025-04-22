@@ -5,5 +5,5 @@ import { UserInfo } from '@app/users/types';
 export interface IRoomUsersListOutgoingMessage
   extends IBaseOutgoingMessage<OutgoingMessageType.ROOM_USERS_LIST> {
   room: string;
-  users: Pick<UserInfo, 'id' | 'username'>[]; // TODO: fix this if needed
+  users: Pick<UserInfo, 'id' | 'username'>[];
 }

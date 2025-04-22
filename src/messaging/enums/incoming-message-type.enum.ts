@@ -1,8 +1,6 @@
 export enum IncomingMessageType {
-  // PING = 'ping',
-  // PONG = 'pong',
   SEND_ROOM_MESSAGE = 'send-room-message',
-  SEND_DIRECT_MESSAGE = 'send-direct-message', // TODO: is it needed
+  SEND_DIRECT_MESSAGE = 'send-direct-message',
 
   LIST_ROOMS = 'list-rooms',
   LIST_ROOM_USERS = 'list-room-users',

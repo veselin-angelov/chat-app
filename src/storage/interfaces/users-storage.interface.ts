@@ -41,13 +41,6 @@ export interface IUsersStorage {
   removeRoomFromUser(userId: string, roomId: string): boolean;
 
   /**
-   * Get all rooms a user is subscribed to
-   * @param userId ID of the user
-   * @returns Array of room IDs
-   */
-  getUserRooms(userId: string): string[];
-
-  /**
    * Check if a user is subscribed to a specific room
    * @param userId ID of the user
    * @param roomId ID of the room

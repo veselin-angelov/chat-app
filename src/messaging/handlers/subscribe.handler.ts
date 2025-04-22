@@ -1,45 +1,50 @@
-import { MessageHandler } from '@app/messaging/types';
 import {
   IAcknowledgeOutgoingMessage,
-  IErrorOutgoingMessage,
+  IMessageHandler,
   ISubscribeIncomingMessage,
 } from '@app/messaging/interfaces';
 import { sendSafe } from '@app/messaging/helpers';
-import { OutgoingMessageType } from '@app/messaging/enums';
-import { roomService, subscriptionService } from '@app/services';
+import { IncomingMessageType, OutgoingMessageType } from '@app/messaging/enums';
+import { IRoomService } from '@app/rooms/interfaces';
+import { ISubscriptionService } from '@app/subscriptions/interfaces';
+import { UserInfo } from '@app/users/types';
+import { WebSocket } from 'ws';
 
-export const subscribeHandler: MessageHandler<ISubscribeIncomingMessage> = (
-  socket,
-  data,
-  currentUser,
-) => {
-  const room = roomService.getRoom(data.room);
+export class SubscribeHandler
+  implements IMessageHandler<ISubscribeIncomingMessage>
+{
+  public readonly messageType = IncomingMessageType.SUBSCRIBE;
 
-  if (!room) {
-    return sendSafe<IErrorOutgoingMessage>(socket, {
-      id: data.id,
-      type: OutgoingMessageType.ERROR,
-      message: `Room ${data.room} not found`,
+  constructor(
+    private readonly roomService: IRoomService,
+    private readonly subscriptionService: ISubscriptionService,
+  ) {}
+
+  public async handle(
+    socket: WebSocket,
+    message: ISubscribeIncomingMessage,
+    currentUser: UserInfo,
+  ): Promise<void> {
+    const room = this.roomService.getRoom(message.room);
+
+    if (!room) {
+      throw new Error(`Room ${message.room} not found`);
+    }
+
+    // Use the subscription service to handle the bidirectional relationship
+    const subscribed = this.subscriptionService.subscribeUserToRoom(
+      currentUser.id,
+      message.room,
+    );
+
+    if (!subscribed) {
+      throw new Error(`Failed to subscribe to room ${message.room}`);
+    }
+
+    return sendSafe<IAcknowledgeOutgoingMessage>(socket, {
+      id: message.id,
+      type: OutgoingMessageType.ACK,
+      message: 'Subscribed',
     });
   }
-
-  // Use the subscription service to handle the bidirectional relationship
-  const subscribed = subscriptionService.subscribeUserToRoom(
-    currentUser.id,
-    data.room,
-  );
-
-  if (!subscribed) {
-    return sendSafe<IErrorOutgoingMessage>(socket, {
-      id: data.id,
-      type: OutgoingMessageType.ERROR,
-      message: `Failed to subscribe to room ${data.room}`,
-    });
-  }
-
-  return sendSafe<IAcknowledgeOutgoingMessage>(socket, {
-    id: data.id,
-    type: OutgoingMessageType.ACK,
-    message: 'Subscribed',
-  });
-};
+}

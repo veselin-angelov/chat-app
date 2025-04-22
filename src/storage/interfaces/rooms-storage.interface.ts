@@ -25,12 +25,6 @@ export interface IRoomsStorage {
   getAllRooms(): RoomInfo[];
 
   /**
-   * Remove a room from storage
-   * @param roomId ID of the room to remove
-   */
-  removeRoom(roomId: string): void;
-
-  /**
    * Add a user to a room's subscribers
    * @param userId ID of the user to add
    * @param roomId ID of the room

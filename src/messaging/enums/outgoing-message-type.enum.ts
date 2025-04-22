@@ -5,7 +5,7 @@ export enum OutgoingMessageType {
   USER_CONNECTED = 'user-connected',
 
   ROOM_MESSAGE = 'room-message',
-  DIRECT_MESSAGE = 'direct-message', // TODO: is it needed
+  DIRECT_MESSAGE = 'direct-message',
 
   ROOMS_LIST = 'rooms-list',
   ROOM_USERS_LIST = 'room-users-list',

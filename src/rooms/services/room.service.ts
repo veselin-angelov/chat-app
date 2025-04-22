@@ -1,18 +1,12 @@
 import { RoomInfo } from '@app/rooms/types';
-import { UserInfo } from '@app/users/types';
-import { IUsersStorage, IRoomsStorage } from '@app/storage/interfaces';
-import { ISubscriptionService } from '@app/subscriptions/interfaces';
+import { IRoomsStorage } from '@app/storage/interfaces';
 import { IRoomService } from '@app/rooms/interfaces';
 
 /**
  * Service for room management operations
  */
 export class RoomService implements IRoomService {
-  constructor(
-    private readonly roomsStorage: IRoomsStorage,
-    private readonly usersStorage: IUsersStorage,
-    private readonly subscriptionService: ISubscriptionService,
-  ) {}
+  constructor(private readonly roomsStorage: IRoomsStorage) {}
 
   /**
    * Create a new room
@@ -33,41 +27,5 @@ export class RoomService implements IRoomService {
    */
   getAllRooms(): RoomInfo[] {
     return this.roomsStorage.getAllRooms();
-  }
-
-  /**
-   * Remove a room completely from the system
-   * This includes unsubscribing all users from the room
-   */
-  removeRoom(roomId: string): boolean {
-    const room = this.roomsStorage.getRoom(roomId);
-
-    if (!room) {
-      return false;
-    }
-
-    // Get all users subscribed to the room before removal
-    const subscribedUsers = Array.from(room.users);
-
-    // Unsubscribe all users from the room
-    subscribedUsers.forEach((userId) => {
-      this.subscriptionService.unsubscribeUserFromRoom(userId, roomId);
-    });
-
-    // Now that all users are unsubscribed, remove the room itself
-    this.roomsStorage.removeRoom(roomId);
-
-    return true;
-  }
-
-  /**
-   * Get all users subscribed to a specific room
-   */
-  getRoomUsers(roomId: string): UserInfo[] {
-    const userIds = this.roomsStorage.getUsersInRoom(roomId);
-
-    return userIds
-      .map((userId) => this.usersStorage.getUser(userId))
-      .filter((user): user is UserInfo => user !== undefined);
   }
 }
